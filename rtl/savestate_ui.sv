@@ -1,4 +1,4 @@
-module savestate_ui #(parameter INFO_TIMEOUT_BITS)
+module savestate_ui/* #(parameter INFO_TIMEOUT_BITS)*/
 (
 	input            clk,    
    input     [10:0] ps2_key,     
@@ -26,7 +26,7 @@ reg lastLeft   = 1'b0;
 reg lastDown   = 1'b0;
 reg lastUp     = 1'b0;
 
-reg [(INFO_TIMEOUT_BITS-1):0] InfoWaitcnt = 0;
+//reg [(INFO_TIMEOUT_BITS-1):0] InfoWaitcnt = 0;
 
 reg        slotswitched   = 1'b0;
 reg [1:0]  lastOSDsetting = 2'b0;
@@ -75,7 +75,7 @@ always @(posedge clk) begin
 		end
 
 		// gamepad
-		if (joySS) begin
+/*		if (joySS) begin
 			// timeout with no button pressed -> help text
 			InfoWaitcnt <= InfoWaitcnt + 1'b1;
 			if (InfoWaitcnt[(INFO_TIMEOUT_BITS-1)]) begin
@@ -108,7 +108,7 @@ always @(posedge clk) begin
 			end
 		end else begin
 			InfoWaitcnt <= 25'b0;
-		end
+		end*/
 		
 		// OSD
 		old_st <= OSD_saveload;

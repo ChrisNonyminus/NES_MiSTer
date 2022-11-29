@@ -47,7 +47,7 @@ assign audio_b      = enable ? {1'b0, audio_in[15:1]} : 16'hZ;
 wire [21:0] prg_aout, chr_aout;
 wire prg_allow;
 wire chr_allow;
-wire vram_a10;
+reg vram_a10;
 wire vram_ce;
 wire [15:0] flags_out = {12'd0, 1'b1, 1'b0, prg_bus_write, 1'b0};
 
@@ -115,8 +115,8 @@ assign SS_MAP1_BACK[26:24] = mirroring;
 assign SS_MAP1_BACK[63:27] = 37'b0; // free to be used
 
 // The CHR bank to load. Each increment here is 1kb. So valid values are 0..255.
-wire [2:0] chr_bank;
-wire [2:0] chr_banko;
+reg [2:0] chr_bank;
+reg [2:0] chr_banko;
 reg [8:0] chrsel;
 always @* begin
 	casez({mirroring[0], mapper137 ? chr_ain[11:10] : chr_ain[12:11]})
@@ -170,6 +170,7 @@ assign prg_allow = prg_ain[15] && !prg_write;
 wire [63:0] SS_MAP1;
 wire [63:0] SS_MAP1_BACK;	
 wire [63:0] SaveStateBus_Dout_active;	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_Dout_active, SS_MAP1_BACK, SS_MAP1);  
 
 assign SaveStateBus_Dout = enable ? SaveStateBus_Dout_active : 64'h0000000000000000;
@@ -225,7 +226,7 @@ assign audio_b      = enable ? {1'b0, audio_in[15:1]} : 16'hZ;
 wire [21:0] prg_aout, chr_aout;
 wire prg_allow;
 wire chr_allow;
-wire vram_a10;
+reg vram_a10;
 wire vram_ce;
 wire [15:0] flags_out = {12'd0, 1'b1, 1'b0, prg_bus_write, 1'b0};
 
@@ -322,6 +323,7 @@ assign vram_a10 = (mapper172 ? mirroring : flags[14]) ? chr_ain[10] : chr_ain[11
 wire [63:0] SS_MAP1;
 wire [63:0] SS_MAP1_BACK;	
 wire [63:0] SaveStateBus_Dout_active;	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_Dout_active, SS_MAP1_BACK, SS_MAP1);  
 
 assign SaveStateBus_Dout = enable ? SaveStateBus_Dout_active : 64'h0000000000000000;

@@ -493,10 +493,10 @@ APU apu(
 	.SaveStateBus_load (loading_savestate ),
 	.SaveStateBus_Dout (SaveStateBus_wired_or[1])
 );
-defparam apu.SSREG_INDEX_TOP  = SSREG_INDEX_APU_TOP;
+/*defparam apu.SSREG_INDEX_TOP  = SSREG_INDEX_APU_TOP;
 defparam apu.SSREG_INDEX_DMC1 = SSREG_INDEX_APU_DMC1;
 defparam apu.SSREG_INDEX_DMC2 = SSREG_INDEX_APU_DMC2;
-defparam apu.SSREG_INDEX_FCT  = SSREG_INDEX_APU_FCT;
+defparam apu.SSREG_INDEX_FCT  = SSREG_INDEX_APU_FCT;*/
 
 assign sample = sample_a;
 reg [15:0] sample_a;
@@ -778,7 +778,7 @@ wire savestate_busy;
 
 wire [63:0] SS_TOP;
 wire [63:0] SS_TOP_BACK;	
-eReg_SavestateV #(SSREG_INDEX_TOP, SSREG_DEFAULT_TOP) iREG_SAVESTATE_TOP (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[4], SS_TOP_BACK, SS_TOP);  
+//eReg_SavestateV #(SSREG_INDEX_TOP, SSREG_DEFAULT_TOP) iREG_SAVESTATE_TOP (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[4], SS_TOP_BACK, SS_TOP);  
 
 wire [63:0] SaveStateBus_Dout  = SaveStateBus_wired_or[0] | SaveStateBus_wired_or[1] | SaveStateBus_wired_or[2] | SaveStateBus_wired_or[3] | SaveStateBus_wired_or[4] | SaveStateExt_Dout;
  

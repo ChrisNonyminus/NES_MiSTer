@@ -201,6 +201,7 @@ assign chr_allow = flags[15];
 wire [63:0] SS_MAP1;
 wire [63:0] SS_MAP1_BACK;	
 wire [63:0] SaveStateBus_Dout_active;	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_Dout_active, SS_MAP1_BACK, SS_MAP1);  
 
 assign SaveStateBus_Dout = enable ? SaveStateBus_Dout_active : 64'h0000000000000000;

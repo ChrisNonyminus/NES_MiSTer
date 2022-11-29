@@ -188,6 +188,7 @@ wire [63:0] SS_MAP1, SS_MAP2;
 wire [63:0] SS_MAP1_BACK, SS_MAP2_BACK;	
 wire [63:0] SaveStateBus_Dout_active = SaveStateBus_wired_or[0] | SaveStateBus_wired_or[1];
 	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[0], SS_MAP1_BACK, SS_MAP1);  
 eReg_SavestateV #(SSREG_INDEX_MAP2, 64'h0000000000000000) iREG_SAVESTATE_MAP2 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[1], SS_MAP2_BACK, SS_MAP2);  
 
@@ -394,7 +395,7 @@ end else if (ce) begin
 
 end
 
-wire output_a, output_b, output_c;
+reg output_a, output_b, output_c;
 
 always_comb begin
 	case ({tone_dis_a, noise_dis_a})
@@ -472,7 +473,8 @@ wire [63:0] SaveStateBus_wired_or[0:SAVESTATE_MODULES-1];
 wire [63:0] SS_MAP1, SS_MAP2, SS_MAP3, SS_MAP4;
 wire [63:0] SS_MAP1_BACK, SS_MAP2_BACK, SS_MAP3_BACK, SS_MAP4_BACK;	
 wire [63:0] SaveStateBus_Dout_active = SaveStateBus_wired_or[0] | SaveStateBus_wired_or[1] | SaveStateBus_wired_or[2] | SaveStateBus_wired_or[3];
-	
+
+import regs_savestates::*;	
 eReg_SavestateV #(SSREG_INDEX_SNDMAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[0], SS_MAP1_BACK, SS_MAP1);  
 eReg_SavestateV #(SSREG_INDEX_SNDMAP2, 64'h0000000000000000) iREG_SAVESTATE_MAP2 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[1], SS_MAP2_BACK, SS_MAP2);  
 eReg_SavestateV #(SSREG_INDEX_SNDMAP3, 64'h0000000000000000) iREG_SAVESTATE_MAP3 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[2], SS_MAP3_BACK, SS_MAP3);  
@@ -529,7 +531,7 @@ assign audio_b      = enable ? {1'b0, audio_in[15:1]} : 16'hZ;
 wire [21:0] prg_aout, chr_aout;
 wire prg_allow;
 wire chr_allow;
-wire vram_a10;
+reg vram_a10;
 wire vram_ce;
 reg irq;
 reg [15:0] flags_out = {12'h0, 1'b1, 3'b0};
@@ -657,6 +659,7 @@ assign vram_ce = chr_ain[13];
 wire [63:0] SS_MAP1;
 wire [63:0] SS_MAP1_BACK;	
 wire [63:0] SaveStateBus_Dout_active;	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_Dout_active, SS_MAP1_BACK, SS_MAP1);  
 
 assign SaveStateBus_Dout = enable ? SaveStateBus_Dout_active : 64'h0000000000000000;
@@ -709,9 +712,9 @@ assign audio_b      = enable ? {1'b0, audio_in[15:1]} : 16'hZ;
 
 wire [21:0] prg_aout, chr_aout;
 wire prg_allow;
-wire ram_enable;
+reg ram_enable;
 wire chr_allow;
-wire vram_a10;
+reg vram_a10;
 wire vram_ce;
 reg [15:0] flags_out = {12'h0, 1'b1, 3'b0};
 
@@ -804,6 +807,7 @@ assign vram_ce = chr_ain[13] && !use_chr_rom;
 wire [63:0] SS_MAP1;
 wire [63:0] SS_MAP1_BACK;	
 wire [63:0] SaveStateBus_Dout_active;	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_Dout_active, SS_MAP1_BACK, SS_MAP1);  
 
 assign SaveStateBus_Dout = enable ? SaveStateBus_Dout_active : 64'h0000000000000000;

@@ -43,7 +43,7 @@ module MMC5(
 	input         Savestate_MAPRAMRdEn,    
 	input         Savestate_MAPRAMWrEn,    
 	input  [7:0]  Savestate_MAPRAMWriteData,
-	output [7:0]  Savestate_MAPRAMReadData
+	output reg [7:0]  Savestate_MAPRAMReadData
 );
 
 assign prg_aout_b   = enable ? prg_aout : 22'hZ;
@@ -67,7 +67,7 @@ reg [7:0] chr_dout, prg_dout;
 wire vram_ce;
 wire [15:0] flags_out = {12'h0, 1'b1, 1'b0, prg_bus_write, has_chr_dout};
 wire irq;
-wire prg_bus_write, has_chr_dout;
+reg prg_bus_write, has_chr_dout;
 wire [15:0] audio = audio_in;
 
 reg [1:0] prg_mode, chr_mode;
@@ -139,21 +139,21 @@ wire [7:0] ram_dataB = Savestate_MAPRAMactive ? Savestate_MAPRAMWriteData : 8'b0
 wire [7:0] last_read_ram;
 
 
-dpram #(.widthad_a(10)) expansion_ram
-(
-	.clock_a   (clk),
-	.address_a (ram_addrA),
-	.wren_a    (ram_wrenA),
-	.byteena_a (1),
-	.data_a    (ram_dataA),
+// dpram #(.widthad_a(10)) expansion_ram
+// (
+// 	.clock_a   (clk),
+// 	.address_a (ram_addrA),
+// 	.wren_a    (ram_wrenA),
+// 	.byteena_a (1),
+// 	.data_a    (ram_dataA),
 
-	.clock_b   (clk),
-	.address_b (ram_addrB),
-	.wren_b    (ram_wrenB),
-	.byteena_b (1),
-	.data_b    (ram_dataB),
-	.q_b       (last_read_ram)
-);
+// 	.clock_b   (clk),
+// 	.address_b (ram_addrB),
+// 	.wren_b    (ram_wrenB),
+// 	.byteena_b (1),
+// 	.data_b    (ram_dataB),
+// 	.q_b       (last_read_ram)
+// );
 
 
 // Handle IO register writes
@@ -683,6 +683,7 @@ wire [63:0] SS_MAP1, SS_MAP2, SS_MAP3, SS_MAP4, SS_MAP5;
 wire [63:0] SS_MAP1_BACK, SS_MAP2_BACK, SS_MAP3_BACK, SS_MAP4_BACK, SS_MAP5_BACK;	
 wire [63:0] SaveStateBus_Dout_active = SaveStateBus_wired_or[0] | SaveStateBus_wired_or[1] | SaveStateBus_wired_or[2] | SaveStateBus_wired_or[3] | SaveStateBus_wired_or[4];
 	
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[0], SS_MAP1_BACK, SS_MAP1);  
 eReg_SavestateV #(SSREG_INDEX_MAP2, 64'h0000000000000000) iREG_SAVESTATE_MAP2 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[1], SS_MAP2_BACK, SS_MAP2);  
 eReg_SavestateV #(SSREG_INDEX_MAP3, 64'h0000000000000000) iREG_SAVESTATE_MAP3 (clk, SaveStateBus_Din, SaveStateBus_Adr, SaveStateBus_wren, SaveStateBus_rst, SaveStateBus_wired_or[2], SS_MAP3_BACK, SS_MAP3);  
@@ -767,6 +768,7 @@ APU mmc5apu(
 	.SaveStateBus_load (SaveStateBus_load ),
 	.SaveStateBus_Dout (SaveStateBus_wired_or[1])
 );
+import regs_savestates::*;
 defparam mmc5apu.SSREG_INDEX_TOP  = SSREG_INDEX_SNDMAP1;
 defparam mmc5apu.SSREG_INDEX_DMC1 = SSREG_INDEX_SNDMAP2;
 defparam mmc5apu.SSREG_INDEX_DMC2 = SSREG_INDEX_SNDMAP3;

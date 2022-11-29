@@ -197,10 +197,10 @@ reg even_frame_toggle = 0; // 1 indicates even frame.
 assign evenframe = even_frame_toggle;
 
 // Dendy is 291 to 310
-wire [8:0] vblank_start_sl;
-wire [8:0] vblank_end_sl;
+reg [8:0] vblank_start_sl;
+reg [8:0] vblank_end_sl;
 wire [8:0] last_sl;
-wire skip_en;
+reg skip_en;
 reg [3:0] rendering_sr;
 
 always_comb begin
@@ -439,7 +439,7 @@ module OAMEval(
 	input         Savestate_OAMRdEn,    
 	input         Savestate_OAMWrEn,    
 	input  [7:0]  Savestate_OAMWriteData,
-	output [7:0]  Savestate_OAMReadData
+	output reg [7:0]  Savestate_OAMReadData
 );
 
 wire [63:0] SS_OAMEVAL;
@@ -870,7 +870,7 @@ wire [3:0] y_f = temp_y[3:0] ^ {flip_y, flip_y, flip_y, flip_y};
 assign load = {load_pix1, load_pix2, load_x, load_attr};
 assign load_in = {pix1_latch, pix2_latch, load_temp, load_temp[1:0], load_temp[5]};
 
-wire [7:0] load_temp;
+reg [7:0] load_temp;
 always_comb begin
 	case (cycle)
 		0: load_temp = temp_y;
@@ -1076,9 +1076,9 @@ module PPU(
 	input         write,            // write
 	output reg    nmi,              // one while inside vblank
 	output        vram_r,           // read from vram active
-	output        vram_r_ex,        // use extra sprite address
+	output  reg      vram_r_ex,        // use extra sprite address
 	output        vram_w,           // write to vram active
-	output [13:0] vram_a,           // vram address
+	output reg [13:0] vram_a,           // vram address
 	output [13:0] vram_a_ex,        // vram address for extra sprites
 	input   [7:0] vram_din,         // vram input
 	output  [7:0] vram_dout,

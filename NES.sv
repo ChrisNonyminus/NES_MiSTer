@@ -3,6 +3,7 @@
 //
 // MiSTer port: Copyright (C) 2017,2018 Sorgelig
 
+import regs_savestates::*;
 module emu
 (
 	//Master input clock
@@ -12,64 +13,64 @@ module emu
 	//Can be used as initial reset.
 	input         RESET,
 
-	//Must be passed to hps_io module
-	inout  [48:0] HPS_BUS,
+	// //Must be passed to hps_io module
+	// // inout  [48:0] HPS_BUS,
 
-	//Base video clock. Usually equals to CLK_SYS.
-	output        CLK_VIDEO,
+	// // //Base video clock. Usually equals to CLK_SYS.
+	// // output        CLK_VIDEO,
 
-	//Multiple resolutions are supported using different CE_PIXEL rates.
-	//Must be based on CLK_VIDEO
-	output        CE_PIXEL,
+	// //Multiple resolutions are supported using different CE_PIXEL rates.
+	// //Must be based on CLK_VIDEO
+	// output        CE_PIXEL,
 
-	//Video aspect ratio for HDMI. Most retro systems have ratio 4:3.
-	//if VIDEO_ARX[12] or VIDEO_ARY[12] is set then [11:0] contains scaled size instead of aspect ratio.
-	output [12:0] VIDEO_ARX,
-	output [12:0] VIDEO_ARY,
+	// //Video aspect ratio for HDMI. Most retro systems have ratio 4:3.
+	// //if VIDEO_ARX[12] or VIDEO_ARY[12] is set then [11:0] contains scaled size instead of aspect ratio.
+	// output [12:0] VIDEO_ARX,
+	// output [12:0] VIDEO_ARY,
 
-	output  [7:0] VGA_R,
-	output  [7:0] VGA_G,
-	output  [7:0] VGA_B,
-	output        VGA_HS,
-	output        VGA_VS,
-	output        VGA_DE,    // = ~(VBlank | HBlank)
-	output        VGA_F1,
-	output [1:0]  VGA_SL,
-	output        VGA_SCALER, // Force VGA scaler
-	output        VGA_DISABLE, // analog out is off
+	output  [7:0] vga_r,
+	output  [7:0] vga_g,
+	output  [7:0] vga_b,
+	output        vga_h,
+	output        vga_v,
+	// output        VGA_DE,    // = ~(VBlank | HBlank)
+	// output        VGA_F1,
+	// output [1:0]  VGA_SL,
+	// output        VGA_SCALER, // Force VGA scaler
+	// output        VGA_DISABLE, // analog out is off
 
-	input  [11:0] HDMI_WIDTH,
-	input  [11:0] HDMI_HEIGHT,
-	output        HDMI_FREEZE,
+	// input  [11:0] HDMI_WIDTH,
+	// input  [11:0] HDMI_HEIGHT,
+	// output        HDMI_FREEZE,
 
-`ifdef MISTER_FB
-	// Use framebuffer in DDRAM
-	// FB_FORMAT:
-	//    [2:0] : 011=8bpp(palette) 100=16bpp 101=24bpp 110=32bpp
-	//    [3]   : 0=16bits 565 1=16bits 1555
-	//    [4]   : 0=RGB  1=BGR (for 16/24/32 modes)
-	//
-	// FB_STRIDE either 0 (rounded to 256 bytes) or multiple of pixel size (in bytes)
-	output        FB_EN,
-	output  [4:0] FB_FORMAT,
-	output [11:0] FB_WIDTH,
-	output [11:0] FB_HEIGHT,
-	output [31:0] FB_BASE,
-	output [13:0] FB_STRIDE,
-	input         FB_VBL,
-	input         FB_LL,
-	output        FB_FORCE_BLANK,
+// `ifdef MISTER_FB
+// 	// Use framebuffer in DDRAM
+// 	// FB_FORMAT:
+// 	//    [2:0] : 011=8bpp(palette) 100=16bpp 101=24bpp 110=32bpp
+// 	//    [3]   : 0=16bits 565 1=16bits 1555
+// 	//    [4]   : 0=RGB  1=BGR (for 16/24/32 modes)
+// 	//
+// 	// FB_STRIDE either 0 (rounded to 256 bytes) or multiple of pixel size (in bytes)
+// 	output        FB_EN,
+// 	output  [4:0] FB_FORMAT,
+// 	output [11:0] FB_WIDTH,
+// 	output [11:0] FB_HEIGHT,
+// 	output [31:0] FB_BASE,
+// 	output [13:0] FB_STRIDE,
+// 	input         FB_VBL,
+// 	input         FB_LL,
+// 	output        FB_FORCE_BLANK,
 
-`ifdef MISTER_FB_PALETTE
-	// Palette control for 8bit modes.
-	// Ignored for other video modes.
-	output        FB_PAL_CLK,
-	output  [7:0] FB_PAL_ADDR,
-	output [23:0] FB_PAL_DOUT,
-	input  [23:0] FB_PAL_DIN,
-	output        FB_PAL_WR,
-`endif
-`endif
+// `ifdef MISTER_FB_PALETTE
+// 	// Palette control for 8bit modes.
+// 	// Ignored for other video modes.
+// 	output        FB_PAL_CLK,
+// 	output  [7:0] FB_PAL_ADDR,
+// 	output [23:0] FB_PAL_DOUT,
+// 	input  [23:0] FB_PAL_DIN,
+// 	output        FB_PAL_WR,
+// `endif
+// `endif
 
 	output        LED_USER,  // 1 - ON, 0 - OFF.
 
@@ -84,110 +85,81 @@ module emu
 	// b[0]: osd button
 	output  [1:0] BUTTONS,
 
-	input         CLK_AUDIO, // 24.576 MHz
-	output [15:0] AUDIO_L,
-	output [15:0] AUDIO_R,
-	output        AUDIO_S,   // 1 - signed audio samples, 0 - unsigned
-	output  [1:0] AUDIO_MIX, // 0 - no mix, 1 - 25%, 2 - 50%, 3 - 100% (mono)
+	// input         CLK_AUDIO, // 24.576 MHz
+	// output [15:0] AUDIO_L,
+	// output [15:0] AUDIO_R,
+	// output        AUDIO_S,   // 1 - signed audio samples, 0 - unsigned
+	// output  [1:0] AUDIO_MIX, // 0 - no mix, 1 - 25%, 2 - 50%, 3 - 100% (mono)
 
-	//ADC
-	inout   [3:0] ADC_BUS,
+	// //ADC
+	// inout   [3:0] ADC_BUS,
 
 	//SD-SPI
 	output        SD_SCK,
-	output        SD_MOSI,
-	input         SD_MISO,
-	output        SD_CS,
 	input         SD_CD,
 
-	//High latency DDR3 RAM interface
-	//Use for non-critical time purposes
-	output        DDRAM_CLK,
-	input         DDRAM_BUSY,
-	output  [7:0] DDRAM_BURSTCNT,
-	output [28:0] DDRAM_ADDR,
-	input  [63:0] DDRAM_DOUT,
-	input         DDRAM_DOUT_READY,
-	output        DDRAM_RD,
-	output [63:0] DDRAM_DIN,
-	output  [7:0] DDRAM_BE,
-	output        DDRAM_WE,
-
-	//SDRAM interface with lower latency
-	output        SDRAM_CLK,
-	output        SDRAM_CKE,
-	output [12:0] SDRAM_A,
-	output  [1:0] SDRAM_BA,
-	inout  [15:0] SDRAM_DQ,
-	output        SDRAM_DQML,
-	output        SDRAM_DQMH,
-	output        SDRAM_nCS,
-	output        SDRAM_nCAS,
-	output        SDRAM_nRAS,
-	output        SDRAM_nWE,
-
-`ifdef MISTER_DUAL_SDRAM
-	//Secondary SDRAM
-	//Set all output SDRAM_* signals to Z ASAP if SDRAM2_EN is 0
-	input         SDRAM2_EN,
-	output        SDRAM2_CLK,
-	output [12:0] SDRAM2_A,
-	output  [1:0] SDRAM2_BA,
-	inout  [15:0] SDRAM2_DQ,
-	output        SDRAM2_nCS,
-	output        SDRAM2_nCAS,
-	output        SDRAM2_nRAS,
-	output        SDRAM2_nWE,
-`endif
+    //RAM Interface
+    inout[15:0] ddr2_dq,
+    inout[1:0] ddr2_dqs_n,
+    inout[1:0] ddr2_dqs_p,
+    output[12:0] ddr2_addr,
+    output[2:0] ddr2_ba,
+    output ddr2_ras_n,
+    output ddr2_cas_n,
+    output ddr2_we_n,
+    output ddr2_ck_p,
+    output ddr2_ck_n,
+    output ddr2_cke,
+    output ddr2_cs_n,
+    output[1:0] ddr2_dm,
+    output ddr2_odt,
 
 	input         UART_CTS,
 	output        UART_RTS,
 	input         UART_RXD,
-	output        UART_TXD,
-	output        UART_DTR,
-	input         UART_DSR,
+	output        UART_TXD
 
-	// Open-drain User port.
-	// 0 - D+/RX
-	// 1 - D-/TX
-	// 2..6 - USR2..USR6
-	// Set USER_OUT to 1 to read from USER_IN.
-	input   [6:0] USER_IN,
-	output  [6:0] USER_OUT,
+	// // Open-drain User port.
+	// // 0 - D+/RX
+	// // 1 - D-/TX
+	// // 2..6 - USR2..USR6
+	// // Set USER_OUT to 1 to read from USER_IN.
+	// input   [6:0] USER_IN,
+	// output  [6:0] USER_OUT,
 
-	input         OSD_STATUS
+	// input         OSD_STATUS
 );
 
-assign ADC_BUS  = 'Z;
+// assign ADC_BUS  = 'Z;
 
-assign AUDIO_S   = 0;
-assign AUDIO_L   = sample[15:0];
-assign AUDIO_R   = AUDIO_L;
-assign AUDIO_MIX = 0;
+// assign AUDIO_S   = 0;
+// assign AUDIO_L   = sample[15:0];
+// assign AUDIO_R   = AUDIO_L;
+// assign AUDIO_MIX = 0;
 
 assign LED_USER  = downloading | (loader_fail & led_blink) | (bk_state != S_IDLE) | (bk_pending & ~status[50]);
 assign LED_DISK  = 0;
 assign LED_POWER = 0;
 assign BUTTONS [1] = 0;
 assign VGA_SCALER  = 0;
-assign VGA_DISABLE = 0;
+//assign VGA_DISABLE = 0;
 
-assign VGA_F1 = 0;
+//assign VGA_F1 = 0;
 //assign {UART_RTS, UART_TXD, UART_DTR} = 0;
-assign {SD_SCK, SD_MOSI, SD_CS} = 'Z;
+assign {SD_SCK} = 'Z;
 
 wire [1:0] ar       = status[19:18];
 wire       vcrop_en = status[5];
 wire [3:0] vcopt    = status[38:35];
 reg        en216p;
 reg  [4:0] voff;
-always @(posedge CLK_VIDEO) begin
+/*always @(posedge CLK_VIDEO) begin
 	en216p <= ((HDMI_WIDTH == 1920) && (HDMI_HEIGHT == 1080) && !forced_scandoubler && !scale);
 	voff <= (vcopt < 6) ? {vcopt,1'b0} : ({vcopt,1'b0} - 5'd24);
-end
+end*/
 
 wire vga_de;
-video_freak video_freak
+/*video_freak video_freak
 (
 	.*,
 	.VGA_DE_IN(vga_de),
@@ -196,7 +168,7 @@ video_freak video_freak
 	.CROP_SIZE((en216p & vcrop_en) ? 10'd216 : 10'd0),
 	.CROP_OFF(voff),
 	.SCALE(status[40:39])
-);
+);*/
 
 // Status Bit Map:
 // 0         1         2         3          4         5         6
@@ -204,7 +176,6 @@ video_freak video_freak
 // 0123456789ABCDEFGHIJKLMNOPQRSTUV 0123456789ABCDEFGHIJKLMNOPQRSTUV
 // XXXXXXXX XX     X XXXXXXXX XXXXX XXXXXXXXXXXXXXXXXXXXX
 
-`include "build_id.v"
 parameter CONF_STR = {
 	"NES;SS3E000000:200000,UART31250,MIDI;",
 	"FS,NESFDSNSF;",
@@ -275,8 +246,7 @@ parameter CONF_STR = {
 	"Save to state 3,",
 	"Restore state 3,",
 	"Save to state 4,",
-	"Restore state 4;",
-	"V,v",`BUILD_DATE
+	"Restore state 4;"
 };
 
 wire [23:0] joyA,joyB,joyC,joyD;
@@ -377,10 +347,10 @@ wire        forced_scandoubler;
 
 wire [21:0] gamma_bus;
 
-hps_io #(.CONF_STR(CONF_STR)) hps_io
+/*hps_io #(.CONF_STR(CONF_STR)) hps_io
 (
 	.clk_sys(clk),
-	.HPS_BUS(HPS_BUS),
+	.HPS_BUS(),
 
 	.buttons(buttons),
 	.forced_scandoubler(forced_scandoubler),
@@ -432,7 +402,7 @@ hps_io #(.CONF_STR(CONF_STR)) hps_io
 	.ps2_mouse(ps2_mouse)
 
 	//.uart_mode(16'b000_11111_000_11111)
-);
+);*/
 
 assign joyA = joyA_unmod[23] ? 23'b0 : joyA_unmod;
 
@@ -443,17 +413,17 @@ wire clock_locked;
 wire clk85;
 wire clk;
 
-pll pll
-(
-	.refclk(CLK_50M),
-	.rst(0),
-	.outclk_0(clk85),
-	.outclk_1(CLK_VIDEO),
-	.outclk_2(clk),
-	.reconfig_to_pll(reconfig_to_pll),
-	.reconfig_from_pll(reconfig_from_pll),
-	.locked(clock_locked)
-);
+// pll pll
+// (
+// 	.refclk(CLK_50M),
+// 	.rst(0),
+// 	.outclk_0(clk85),
+// 	.outclk_1(),
+// 	.outclk_2(clk),
+// 	.reconfig_to_pll(reconfig_to_pll),
+// 	.reconfig_from_pll(reconfig_from_pll),
+// 	.locked(clock_locked)
+// );
 
 wire [63:0] reconfig_to_pll;
 wire [63:0] reconfig_from_pll;
@@ -462,19 +432,19 @@ reg         cfg_write;
 reg   [5:0] cfg_address;
 reg  [31:0] cfg_data;
 
-pll_cfg pll_cfg
-(
-	.mgmt_clk(CLK_50M),
-	.mgmt_reset(0),
-	.mgmt_waitrequest(cfg_waitrequest),
-	.mgmt_read(0),
-	.mgmt_readdata(),
-	.mgmt_write(cfg_write),
-	.mgmt_address(cfg_address),
-	.mgmt_writedata(cfg_data),
-	.reconfig_to_pll(reconfig_to_pll),
-	.reconfig_from_pll(reconfig_from_pll)
-);
+// pll_cfg pll_cfg
+// (
+// 	.mgmt_clk(CLK_50M),
+// 	.mgmt_reset(0),
+// 	.mgmt_waitrequest(cfg_waitrequest),
+// 	.mgmt_read(0),
+// 	.mgmt_readdata(),
+// 	.mgmt_write(cfg_write),
+// 	.mgmt_address(cfg_address),
+// 	.mgmt_writedata(cfg_data),
+// 	.reconfig_to_pll(reconfig_to_pll),
+// 	.reconfig_from_pll(reconfig_from_pll)
+// );
 
 always @(posedge CLK_50M) begin : cfg_block
 	reg pald = 0, pald2 = 0;
@@ -555,22 +525,17 @@ wire raw_serial = |status[52:51];
 wire extend_serial_d4 = status[52:51] == 2'b10;
 wire snac_3d_glasses = &status[52:51];
 
-wire serial_d4 = extend_serial_d4 ? |serial_d4_sr : ~USER_IN[4];
+wire serial_d4 = serial_d4_sr;
 reg [7:0] serial_d4_sr;
 reg snac_p2 = 0;
 
 always @(posedge clk) begin
 	reg [17:0] clk_cnt;
 
-	if (raw_serial) begin
-		if (~USER_IN[6])
-			snac_p2 <= 1;
-	end else begin
-		snac_p2 <= 0;
-	end
+	snac_p2 <= 0;
 
 	clk_cnt <= clk_cnt + 1'b1;
-	serial_d4_sr[0] <= ~USER_IN[4];
+	//serial_d4_sr[0] <= ~USER_IN[4];
 
 	// Shift every 10ms
 	if (clk_cnt == 18'd214772) begin
@@ -589,28 +554,28 @@ end
 // 5  IN    P1D0        RX-
 // 6  IN    P2D0        TX+
 
-assign USER_OUT[4] = 1'b1;
-assign USER_OUT[5] = 1'b1;
-assign USER_OUT[6] = 1'b1;
+// assign USER_OUT[4] = 1'b1;
+// assign USER_OUT[5] = 1'b1;
+// assign USER_OUT[6] = 1'b1;
 
 reg [4:0] joypad1_data, joypad2_data;
 
-wire joy0_d0 = snac_p2 ? ~USER_IN[6] : joypad_bits[0];
-wire joy1_d0 = snac_p2 ? ~USER_IN[6] : joypad_bits2[0];
+wire joy0_d0 = joypad_bits[0];
+wire joy1_d0 = joypad_bits2[0];
 
 always_comb begin
 	if (raw_serial) begin
-		USER_OUT[0]  = joypad_out[0];
-		USER_OUT[1]  = ~joy_swap ? ~joypad_clock[1] : ~joypad_clock[0];
-		USER_OUT[2]  = snac_3d_glasses ? joypad_out[1] : 1'b1;
-		USER_OUT[3]  = ~joy_swap ? ~joypad_clock[0] : ~joypad_clock[1];
-		joypad1_data = {2'b0, mic, 1'b0, ~joy_swap ? joy0_d0 : ~USER_IN[5]};
-		joypad2_data = {serial_d4, snac_3d_glasses ? 1'b1 : ~USER_IN[2], 2'b00, ~joy_swap ? ~USER_IN[5] : joy1_d0};
+		// USER_OUT[0]  = joypad_out[0];
+		// USER_OUT[1]  = ~joy_swap ? ~joypad_clock[1] : ~joypad_clock[0];
+		// USER_OUT[2]  = snac_3d_glasses ? joypad_out[1] : 1'b1;
+		// USER_OUT[3]  = ~joy_swap ? ~joypad_clock[0] : ~joypad_clock[1];
+		// joypad1_data = {2'b0, mic, 1'b0, ~joy_swap ? joy0_d0 : ~USER_IN[5]};
+		// joypad2_data = {serial_d4, snac_3d_glasses ? 1'b1 : ~USER_IN[2], 2'b00, ~joy_swap ? ~USER_IN[5] : joy1_d0};
 	end else begin
-		USER_OUT[0]  = 1'b1;
-		USER_OUT[1]  = 1'b1;
-		USER_OUT[2]  = 1'b1;
-		USER_OUT[3]  = 1'b1;
+		// USER_OUT[0]  = 1'b1;
+		// USER_OUT[1]  = 1'b1;
+		// USER_OUT[2]  = 1'b1;
+		// USER_OUT[3]  = 1'b1;
 
 		joypad1_data = {2'b0, mic, paddle_en & paddle_btn, joypad_bits[0]};
 		joypad2_data = joypad_bits2[0];
@@ -627,7 +592,7 @@ wire mic = (mic_cnt < 8'd215) && mic_button;
 reg [7:0] mic_cnt;
 always @(posedge clk) mic_cnt <= (mic_cnt == 8'd250) ? 8'd0 : mic_cnt + 1'b1;
 
-assign {UART_RTS, UART_DTR} = 1;
+assign UART_RTS = 1;
 wire [15:0] uart_data;
 miraclepiano miracle(
 	.clk(clk),
@@ -796,10 +761,10 @@ wire      corepaused;
 wire      refresh;
 wire      sleep_savestate;
 
-assign HDMI_FREEZE = corepaused;
+//assign HDMI_FREEZE = corepaused;
 
 always_ff @(posedge clk) begin
-	pausecore <= sleep_savestate | (status[41] && OSD_STATUS && !ioctl_download && !reset_nes);
+	pausecore <= sleep_savestate | (status[41] && !ioctl_download && !reset_nes);
 
 	if (!corepaused) begin
 		videopause_ce <= nes_ce + 1'd1;
@@ -920,22 +885,22 @@ always @(posedge clk) begin
 	end
 end
 
-spram #(.addr_width(13)) fds_bios
+/*spram #(.addr_width(13)) fds_bios
 (
 	.clock(clk),
 	.address(loader_addr[12:0]),
 	.wren(bios_write),
 	.data(loader_write_data),
 	.q(bios_data)
-);
+);*/
 
 wire [7:0] nsf_data;
-spram #(12, 8, "rtl/loopy_NSF.mif") nsfplayrom
+/*spram #(12, 8, "rtl/loopy_NSF.mif") nsfplayrom
 (
 	.clock(clk),
 	.address(loader_addr[11:0]),
 	.q(nsf_data)
-);
+);*/
 
 // loader_write -> clock when data available
 reg loader_write_mem;
@@ -969,60 +934,87 @@ wire        ch2_rd   = sleep_savestate ? Savestate_SDRAMRdEn      : save_rd;
 
 assign Savestate_SDRAMReadData = save_dout;
 
-sdram sdram
+// sdram sdram
+// (
+// 	.*,
+
+// 	// system interface
+// 	.clk        ( clk85           ),
+// 	.init       ( !clock_locked   ),
+
+// 	// cpu/chipset interface
+// 	.ch0_addr   (  (downloading | loader_busy) ? loader_addr_mem       : {3'b0, ppu_addr}  ),
+// 	.ch0_wr     (                                loader_write_mem      | ppu_write ),
+// 	.ch0_din    (  (downloading | loader_busy) ? loader_write_data_mem : ppu_dout  ),
+// 	.ch0_rd     ( ~(downloading | loader_busy)                         & ppu_read  ),
+// 	.ch0_dout   ( ppu_din   ),
+// 	.ch0_busy   ( ),
+
+// 	.ch1_addr   ( cpu_addr  ),
+// 	.ch1_wr     ( cpu_write ),
+// 	.ch1_din    ( cpu_dout  ),
+// 	.ch1_rd     ( cpu_read  ),
+// 	.ch1_dout   ( cpu_din   ),
+// 	.ch1_busy   ( ),
+
+// 	// reserved for backup ram save/load
+// 	.ch2_addr   ( ch2_addr ),
+// 	.ch2_wr     ( ch2_wr ),
+// 	.ch2_din    ( ch2_din ),
+// 	.ch2_rd     ( ch2_rd ),
+// 	.ch2_dout   ( save_dout ),
+// 	.ch2_busy   ( save_busy ),
+
+// 	.refresh    (refresh  ),
+// 	.ss_in      (sdram_ss_in),
+// 	.ss_load    (savestate_load),
+// 	.ss_out     (sdram_ss_out)
+// );
+mem_example sdram
 (
 	.*,
-
-	// system interface
-	.clk        ( clk85           ),
-	.init       ( !clock_locked   ),
-
-	// cpu/chipset interface
-	.ch0_addr   (  (downloading | loader_busy) ? loader_addr_mem       : {3'b0, ppu_addr}  ),
-	.ch0_wr     (                                loader_write_mem      | ppu_write ),
-	.ch0_din    (  (downloading | loader_busy) ? loader_write_data_mem : ppu_dout  ),
-	.ch0_rd     ( ~(downloading | loader_busy)                         & ppu_read  ),
-	.ch0_dout   ( ppu_din   ),
-	.ch0_busy   ( ),
-
-	.ch1_addr   ( cpu_addr  ),
-	.ch1_wr     ( cpu_write ),
-	.ch1_din    ( cpu_dout  ),
-	.ch1_rd     ( cpu_read  ),
-	.ch1_dout   ( cpu_din   ),
-	.ch1_busy   ( ),
-
-	// reserved for backup ram save/load
-	.ch2_addr   ( ch2_addr ),
-	.ch2_wr     ( ch2_wr ),
-	.ch2_din    ( ch2_din ),
-	.ch2_rd     ( ch2_rd ),
-	.ch2_dout   ( save_dout ),
-	.ch2_busy   ( save_busy ),
-
-	.refresh    (refresh  ),
-	.ss_in      (sdram_ss_in),
-	.ss_load    (savestate_load),
-	.ss_out     (sdram_ss_out)
+	.clk_mem(clk),
+	.addr(cpu_addr),
+	.rst_n(reset_nes),
+	.cpu_clk(clk),
+	.data_in(cpu_dout),
+	.data_out(cpu_din),
+	.width(),
+	.rstrobe(),
+	.wstrobe(),
+	.transaction_complete(),
+	.ready()
 );
 
 wire [7:0] save_dout;
 assign sd_buff_din = bram_en ? eeprom_dout : save_dout;
 
 wire [7:0] eeprom_dout;
-dpram #(" ", 11) eeprom
+mem_example eeprom
 (
-	.clock_a(clk85),
-	.address_a(bram_addr),
-	.data_a(bram_dout),
-	.wren_a(bram_write),
-	.q_a(bram_din),
+	.*,
+	// .clock_a(clk85),
+	// .address_a(bram_addr),
+	// .data_a(bram_dout),
+	// .wren_a(bram_write),
+	// .q_a(bram_din),
 
-	.clock_b(clk),
-	.address_b({sd_lba[1:0],sd_buff_addr}),
-	.data_b(sd_buff_dout),
-	.wren_b(sd_buff_wr & sd_ack),
-	.q_b(eeprom_dout)
+	// .clock_b(clk),
+	// .address_b({sd_lba[1:0],sd_buff_addr}),
+	// .data_b(sd_buff_dout),
+	// .wren_b(sd_buff_wr & sd_ack),
+	// .q_b(eeprom_dout)
+	.clk_mem(clk),
+	.addr(bram_addr),
+	.rst_n(reset_nes),
+	.cpu_clk(clk),
+	.data_in(bram_din),
+	.data_out(bram_dout),
+	.width(),
+	.rstrobe(),
+	.wstrobe(),
+	.transaction_complete(),
+	.ready()
 );
 
 wire save_busy;
@@ -1056,7 +1048,7 @@ end
 reg bk_pending;
 wire save_written;
 always @(posedge clk) begin
-	if ((mapper_flags[25] || fds) && ~OSD_STATUS && save_written)
+	if ((mapper_flags[25] || fds) && save_written)
 		bk_pending <= 1'b1;
 	else if (bk_state)
 		bk_pending <= 1'b0;
@@ -1101,7 +1093,7 @@ end
 ///////////////////////////////////////////////////
 wire [2:0] scale = status[3:1];
 wire [2:0] sl = scale ? scale - 1'd1 : 3'd0;
-assign VGA_SL = sl[1:0];
+//assign VGA_SL = sl[1:0];
 
 wire [1:0] reticle;
 wire hold_reset;
@@ -1127,17 +1119,22 @@ video video
 	.load_color_index(pal_index),
 	.emphasis(emphasis),
 	.reticle(~status[22] ? reticle : 2'b00),
-	.pal_video(pal_video)
+	.pal_video(pal_video),
+	.R(vga_r),
+	.G(vga_g),
+	.B(vga_b),
+	.HSync(vga_h),
+	.VSync(vga_v)
 );
 
-video_mixer #(260, 0, 1) video_mixer
+/*video_mixer #(260, 0, 1) video_mixer
 (
 	.*,
 	.freeze_sync(),
 	.VGA_DE(vga_de),
 	.hq2x(scale==1),
 	.scandoubler(scale || forced_scandoubler)
-);
+);*/
 
 ////////////////////////////  CODES  ///////////////////////////////////
 
@@ -1193,7 +1190,7 @@ always @(posedge clk) begin
 end
 
 wire bk_load    = status[6];
-wire bk_save    = status[7] | (bk_pending & OSD_STATUS && ~status[50]);
+wire bk_save    = status[7] | (~status[50]);
 reg  bk_loading = 0;
 reg  bk_loading_req = 0;
 reg  bk_request = 0;
@@ -1281,18 +1278,32 @@ eReg_SavestateV #(SSREG_INDEX_EXT, SSREG_DEFAULT_EXT) iREG_SAVESTATE_Ext (clk, S
 assign SS_Ext_BACK[15: 0] = sdram_ss_out;
 assign SS_Ext_BACK[63:16] = 48'b0; // free to be used
 
-assign DDRAM_CLK = clk;
-ddram ddram
+//assign DDRAM_CLK = clk;
+wire mem_transaction_complete;
+reg[1:0] mem_transaction_width;
+reg mem_wstrobe, mem_rstrobe;
+mem_example ddram
 (
 	.*,
 
-	.ch1_addr({ss_addr, 1'b0}),
-	.ch1_din(ss_din),
-	.ch1_dout(ss_dout),
-	.ch1_req(ss_req),
-	.ch1_rnw(ss_rnw),
-	.ch1_be(ss_be),
-	.ch1_ready(ss_ack)
+	// .ch1_addr({ss_addr, 1'b0}),
+	// .ch1_din(ss_din),
+	// .ch1_dout(ss_dout),
+	// .ch1_req(ss_req),
+	// .ch1_rnw(ss_rnw),
+	// .ch1_be(ss_be),
+	// .ch1_ready(ss_ack)
+	.clk_mem(clk),
+	.addr({ss_addr, 1'b0}),
+	.rst_n(reset_nes),
+	.cpu_clk(clk),
+	.data_in(ss_din),
+	.data_out(ss_dout),
+	.width(mem_transaction_width),
+	.rstrobe(mem_rstrobe),
+	.wstrobe(mem_wstrobe),
+	.transaction_complete(mem_transaction_complete),
+	.ready(ss_ack)
 );
 
 // saving with keyboard/OSD/gamepad
@@ -1322,7 +1333,7 @@ savestate_ui savestate_ui
 	.statusUpdate   (statusUpdate  ),
 	.selected_slot  (ss_slot       )
 );
-defparam savestate_ui.INFO_TIMEOUT_BITS = 25;
+//defparam savestate_ui.INFO_TIMEOUT_BITS = 25;
 
 endmodule
 

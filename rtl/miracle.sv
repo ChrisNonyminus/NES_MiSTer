@@ -151,31 +151,31 @@ always @ (posedge clk) begin
 	end
 end
 
-dpram #(" ", 9) inbuffer
-(
-	.clock_a(clk),
-	.address_a(raddrw),
-	.wren_a(rw),
-	.data_a(rdataw),
-	.q_a(),
+// dpram #(" ", 9) inbuffer
+// (
+// 	.clock_a(clk),
+// 	.address_a(raddrw),
+// 	.wren_a(rw),
+// 	.data_a(rdataw),
+// 	.q_a(),
 	
-	.clock_b(clk),
-	.address_b(raddrr),
-	.q_b(rdatar)
-);
+// 	.clock_b(clk),
+// 	.address_b(raddrr),
+// 	.q_b(rdatar)
+// );
 
-dpram #(" ", 9) outbuffer
-(
-	.clock_a(clk),
-	.address_a(taddrw),
-	.wren_a(tw),
-	.data_a({tdataw[6:0], strobe}),
-	.q_a(),
+// dpram #(" ", 9) outbuffer
+// (
+// 	.clock_a(clk),
+// 	.address_a(taddrw),
+// 	.wren_a(tw),
+// 	.data_a({tdataw[6:0], strobe}),
+// 	.q_a(),
 	
-	.clock_b(clk),
-	.address_b(taddrr),
-	.q_b(tdatar)
-);
+// 	.clock_b(clk),
+// 	.address_b(taddrr),
+// 	.q_b(tdatar)
+// );
 
 midi_uart miracle(
 	.clk(clk),

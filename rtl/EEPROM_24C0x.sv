@@ -190,6 +190,7 @@ assign SS_MAP1_BACK[63:36] = 28'b0;  // free to be used
 
 wire [63:0] SS_MAP1;
 wire [63:0] SS_MAP1_BACK;
+import regs_savestates::*;
 eReg_SavestateV #(SSREG_INDEX_L2MAP1, 64'h0000000000000000) iREG_SAVESTATE_MAP1 (
 		clk,
 		SaveStateBus_Din,
